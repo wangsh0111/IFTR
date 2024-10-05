@@ -116,7 +116,7 @@ python opencood/tools/inference.py --model_dir MODEL_DIR [--fusion_method iftr]
 ```
 
 - `inference.py` There are a number of optional parameters. Please go to the code to see details
-- `[--fusion_method iftr]` The default `fusion_method` is `iftr`, which corresponds to the iftr model with the addition of late melting strategy
+- `[--fusion_method iftr]` The default `fusion_method` is `iftr`, which corresponds to the iftr model with the addition of late fusion strategy
 
 **Optional** **fusion_method** **include**
 
