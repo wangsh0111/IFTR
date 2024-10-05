@@ -1,0 +1,63 @@
+name: dair_iftr_efficientnet_b2_bs_2x1
+data_dir: "/data2/wsh/data/DAIR-V2X/DAIR-V2X-C/cooperative-vehicle-infrastructure"
+root_dir: "/data2/wsh/data/DAIR-V2X/DAIR-V2X-C/cooperative-vehicle-infrastructure/train.json"
+validate_dir: "/data2/wsh/data/DAIR-V2X/DAIR-V2X-C/cooperative-vehicle-infrastructure/val.json"
+test_dir: "/data2/wsh/data/DAIR-V2X/DAIR-V2X-C/cooperative-vehicle-infrastructure/val.json"
+
+train_params:
+  batch_size: 1
+  epoches: 48
+  eval_freq: 2
+  save_freq: 1
+  max_cav: 2
+
+input_source: ['camera', 'lidar']
+label_type: 'camera'
+
+comm_range: 100
+only_vis_ego: true
+
+fusion:
+  core_method: 'intermediate'
+  dataset: 'dairv2x'
+  args:
+    data_aug_conf:
+      resize_lim: [0.46, 0.48]
+      final_dim: [512, 896]
+      rot_lim: [0, 0]
+      H: 1080
+      W: 1920
+      rand_flip: False
+      bot_pct_lim: [0.0, 0.05]
+      cams: ['camera0', 'camera1', 'camera2', 'camera3'] # placeholder. no use
+      Ncams: 4 # placeholder. no use
+
+
+# anchor box related
+postprocess:
+  core_method: 'VoxelPostprocessor' # VoxelPostprocessor, BevPostprocessor supported
+  gt_range: &cav_lidar [-51.2, -51.2, -3, 51.2, 51.2, 1]
+  voxel_size: [0.4, 0.4, 4]
+  anchor_args:
+    cav_lidar_range: *cav_lidar
+    l: 4.5
+    w: 2
+    h: 1.56
+    feature_stride: 2
+    r: &anchor_yaw [0, 90]
+    num: 2
+  target_args:
+    pos_threshold: 0.6
+    neg_threshold: 0.45
+    score_threshold: 0.20
+  order: 'hwl' # hwl or lwh
+  max_num: 150 # maximum number of objects in a single frame. use this number to make sure different frames has the same dimension in the same batch
+  nms_thresh: 0.15
+  dir_args:
+    dir_offset: 0.7853
+    num_bins: 2
+    anchor_yaw: *anchor_yaw
+
+# model related
+model:
+  config: '/data2/wsh/paper_project/IFTR-main/opencood/hypes_yaml/dairv2x/iftr_efficientnet_b2/iftr_efficientnet_b2.py'

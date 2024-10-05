@@ -1,0 +1,17 @@
+icecream
+opencv-python-headless
+open3d
+matplotlib
+tensorboardx
+pyyaml
+h5py
+einops
+pyquaternion
+numpy
+cython
+tensorboardX
+shapely
+einops
+imageio
+python-lzf
+efficientnet_pytorch==0.7.0
