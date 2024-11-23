@@ -1,0 +1,64 @@
+name: v2xset_iftr_efficientnet_b2_bs_2x1
+root_dir: "/data2/wsh/data/v2xset/train"
+validate_dir: "/data2/wsh/data/v2xset/validate"
+test_dir: "/data2/wsh/data/v2xset/test"
+
+train_params:
+  batch_size: 1
+  epoches: 48
+  eval_freq: 2
+  save_freq: 1
+  max_cav: 2
+
+input_source: ['camera', 'lidar']
+label_type: 'camera'
+
+comm_range: 70
+only_vis_ego: true
+
+add_data_extension: ['bev_visibility.png']
+
+fusion:
+  core_method: 'intermediate'
+  dataset: 'v2xset'
+  args:
+    data_aug_conf:
+      resize_lim: [0.80, 0.85]
+      final_dim: [480, 640]
+      rot_lim: [-3.6, 3.6]
+      H: 600
+      W: 800
+      rand_flip: False
+      bot_pct_lim: [0.0, 0.05]
+      cams: ['camera0', 'camera1', 'camera2', 'camera3']
+      Ncams: 4
+
+
+# anchor box related, note: we not use anchor and nms
+postprocess:
+  core_method: 'VoxelPostprocessor'
+  gt_range: &cav_lidar [-51.2, -51.2, -3, 51.2, 51.2, 1]
+  voxel_size: [0.8, 0.8, 4]
+  anchor_args:
+    cav_lidar_range: *cav_lidar
+    l: 3.9
+    w: 1.6
+    h: 1.56
+    feature_stride: 2
+    r: &anchor_yaw [0, 90]
+    num: 2
+  target_args:
+    pos_threshold: 0.6
+    neg_threshold: 0.45
+    score_threshold: 0.25
+  order: 'hwl' # hwl or lwh
+  max_num: 150 # maximum number of objects in a single frame. use this number to make sure different frames has the same dimension in the same batch
+  nms_thresh: 0.15
+  dir_args:
+    dir_offset: 0.7853
+    num_bins: 2
+    anchor_yaw: *anchor_yaw
+
+# model related
+model:
+  config: '/data2/wsh/paper_project/IFTR-main/opencood/hypes_yaml/v2xset/iftr_efficientnet_b2/iftr_efficientnet_b2.py'
